@@ -6,5 +6,8 @@ observed=len(root.findall('.//testcase'))
 ok=(observed==expected and all(int(root.attrib.get(k,'0'))==0 for k in ('failures','errors','skipped')))
 score=1.0 if ok else 0.0
 json.dump({'score':score,'expected_tests':expected,'observed_tests':observed},open(a.report_out,'w'),sort_keys=True)
-open(a.reward_out,'w').write(f'{score:.3f}\n')
+import os
+os.chmod(a.reward_out,0o644)
+with open(a.reward_out,'w',encoding='utf-8') as fh: fh.write(f'{score:.3f}\\n')
+os.chmod(a.reward_out,0o444)
 raise SystemExit(0 if ok else 1)
