@@ -1,17 +1,27 @@
-#!/usr/bin/env bash
-set -Eeuo pipefail
-REWARD_PATH=/logs/verifier/reward.txt
-REPORT_DIR=/logs/verifier
-TMP="$REWARD_PATH.tmp.$$"
-ok=0
-mkdir -p "$REPORT_DIR"
-printf '0.00\n' > "$REWARD_PATH"
-cleanup_zero(){ if [ "$ok" -ne 1 ]; then printf '0.00\n' > "$REWARD_PATH"; fi; rm -f "$TMP"; }
-trap cleanup_zero ERR INT TERM HUP EXIT
+#!/bin/sh
+set -eu
+REWARD_FILE=/logs/verifier/reward.txt
+REPORT=/logs/verifier/dispatch-junit.xml
+REPORT_TMP="${REPORT}.tmp.$$"
+STATUS=/logs/verifier/verification-status.txt
+mkdir -p /logs/verifier
+complete=0
+write_reward(){ chmod 0644 "$REWARD_FILE" 2>/dev/null || true; printf '%s\n' "$1" > "$REWARD_FILE"; chmod 0444 "$REWARD_FILE" 2>/dev/null || true; }
+cleanup(){ code=$?; if [ "$complete" -ne 1 ]; then write_reward 0.000; printf 'INCOMPLETE\n' > "$STATUS"; fi; rm -f "$REPORT_TMP"; exit "$code"; }
+trap cleanup EXIT INT TERM HUP
+write_reward 0.000
+printf 'INCOMPLETE\n' > "$STATUS"
 cd /tests
-python3 -B -I -m pip install --disable-pip-version-check --no-index --find-links=/tests/wheels --require-hashes -r /tests/requirements.txt >/logs/verifier/install.log 2>&1
-python3 -B -I -m pytest -q -p no:cacheprovider --junitxml="$REPORT_DIR/pytest.xml" /tests/test_dispatch.py >"$REPORT_DIR/pytest.log" 2>&1
-printf '1.00\n' > "$TMP"
-mv -f "$TMP" "$REWARD_PATH"
-ok=1
-trap - ERR INT TERM HUP
+set +e
+timeout --signal=TERM --kill-after=10s 300s python3 -B -I -m pytest -q -p no:cacheprovider --junitxml="$REPORT_TMP" /tests/test_outputs.py >/logs/verifier/pytest.log 2>&1
+rc=$?
+set -e
+if [ "$rc" -ne 0 ] || [ ! -s "$REPORT_TMP" ]; then exit 1; fi
+python3 -B -I /tests/verify_junit.py "$REPORT_TMP"
+python3 -B -I /tests/score.py --config /tests/scoring.json --junit "$REPORT_TMP" --report-out /logs/verifier/scoring-report.json --reward-out "$REWARD_FILE"
+mv -f "$REPORT_TMP" "$REPORT"
+complete=1
+write_reward 1.000
+printf 'COMPLETED\n' > "$STATUS"
+trap - EXIT INT TERM HUP
+exit 0
