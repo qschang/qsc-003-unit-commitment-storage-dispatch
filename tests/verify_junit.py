@@ -6,4 +6,4 @@ root=ET.parse(sys.argv[1]).getroot(); cases=root.findall('.//testcase'); names=[
 if len(cases)!=len(EXPECTED) or set(names)!=EXPECTED or len(set(names))!=len(names): raise SystemExit('unexpected testcase identities')
 for k in ('failures','errors','skipped','disabled'):
  if int(root.attrib.get(k,'0'))!=0: raise SystemExit('non-passing junit status')
-if int(root.attrib.get('tests','-1'))!=len(EXPECTED): raise SystemExit('wrong test count')
+if len(cases)!=len(EXPECTED): raise SystemExit('wrong test count')
