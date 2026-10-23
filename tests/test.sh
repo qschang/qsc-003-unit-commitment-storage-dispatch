@@ -13,7 +13,7 @@ write_reward 0.000
 printf 'INCOMPLETE\n' > "$STATUS"
 cd /tests
 set +e
-timeout --signal=TERM --kill-after=10s 300s python3 -B -I -m pytest -q -p no:cacheprovider --junitxml="$REPORT_TMP" /tests/test_outputs.py >/logs/verifier/pytest.log 2>&1
+timeout --signal=TERM --kill-after=10s 300s python3 -B -I -m pytest -v -p no:cacheprovider --junitxml="$REPORT_TMP" /tests/test_outputs.py >/logs/verifier/pytest.log 2>&1
 rc=$?
 set -e
 if [ "$rc" -ne 0 ] || [ ! -s "$REPORT_TMP" ]; then exit 1; fi
