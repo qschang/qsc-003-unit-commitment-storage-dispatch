@@ -64,15 +64,15 @@ def test_output_schema_is_exact_and_ordered():
 def test_invalid_input_preserves_absent_output():
     # CASE-QSC003-12
  """Invalid input rejects without creating output."""
- d=base(); d['storage']['charge_efficiency']=0; r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a)
+ d=base(); d['storage']['charge_efficiency']=0; r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a) and not any(x.split('.')[-1] in {'report','log','ledger','summary','checkpoint'} for x in a)
 def test_invalid_input_preserves_sentinel():
     # CASE-QSC003-13
  """Invalid input rejects without changing an existing output sentinel."""
- d=base(); d['periods'][1]['load_MW']=-1; r,b,s,a=run(d,True); assert r.returncode!=0 and b==s and not any(x.endswith('.tmp') for x in a)
+ d=base(); d['periods'][1]['load_MW']=-1; r,b,s,a=run(d,True); assert r.returncode!=0 and b==s and not any(x.endswith('.tmp') for x in a) and not any(x.split('.')[-1] in {'report','log','ledger','summary','checkpoint'} for x in a)
 def test_late_invalid_period_is_atomic():
     # CASE-QSC003-14
  """A late invalid period cannot publish a prefix."""
- d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a)
+ d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a) and not any(x.split('.')[-1] in {'report','log','ledger','summary','checkpoint'} for x in a)
 
 
 
@@ -116,7 +116,8 @@ def test_summary_cost_includes_generation_and_startup():
 def test_absent_parent_directory_is_io_failure():
     """A missing output parent is rejected without creating a side artifact."""
     with tempfile.TemporaryDirectory() as td:
-        p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists() and not (p/'missing').exists()
+        p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists() and not (p/'missing').exists() and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*'))
+
 
 
 
