@@ -18,7 +18,7 @@ def good(d=None):
 def rec(x): return x["dispatch"]
 # CASE-QSC003-01
 def test_minimum_up_duration_is_respected():
- """CASE-QSC003-01: "load balance each period" and minimum up duration."""
+ """CASE-QSC003-01: "load balance each period" and "领域约束包括" minimum up duration."""
  x=good(); a=[g['on'] for q in rec(x) for g in q['generators'] if g['id']=='cheap']; assert not (a[0] and not a[1] and 1 < base()['generators'][0]['min_up_hours'])
 # CASE-QSC003-02
 def test_initial_off_state_honors_minimum_down_duration():
