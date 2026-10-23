@@ -86,6 +86,16 @@
       "priority": "core",
       "rationale": "direct boundary assertion",
       "weight": 0.04
+    },
+    "test_outputs.py::test_initial_inventory_zero_boundary_is_accepted": {
+      "priority": "core",
+      "rationale": "direct inclusive boundary assertion",
+      "weight": 0.04
+    },
+    "test_outputs.py::test_capacity_upper_boundary_is_accepted": {
+      "priority": "core",
+      "rationale": "direct inclusive boundary assertion",
+      "weight": 0.04
     }
   },
   "weight_policy": {

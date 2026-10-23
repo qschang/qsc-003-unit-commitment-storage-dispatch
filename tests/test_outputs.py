@@ -75,3 +75,10 @@ def test_zero_efficiency_is_rejected():
 def test_zero_initial_inventory_is_valid():
     """CASE-QSC003-BOUND-02: zero initial inventory is inclusive."""
     d=base(); d['thermal_store']['initial_MWh']=0; assert 'summary' in good(d)
+
+def test_initial_inventory_zero_boundary_is_accepted():
+    """CASE-QSC003-BOUND-03: zero lower bound is accepted."""
+    d=base(); d['thermal_store'].update({'capacity_MWh':1,'initial_MWh':0,'terminal_MWh':0}); assert 'schedule' in good(d)
+def test_capacity_upper_boundary_is_accepted():
+    """CASE-QSC003-BOUND-04: capacity upper bound is accepted."""
+    d=base(); d['thermal_store'].update({'capacity_MWh':1,'initial_MWh':1,'terminal_MWh':1,'max_charge_MW':0,'max_discharge_MW':0}); d['periods']=[{'demand_MWh':0,'ambient_C':10,'electricity_price':0}]*3; assert good(d)['summary']['final_storage_MWh']==pytest.approx(1)
