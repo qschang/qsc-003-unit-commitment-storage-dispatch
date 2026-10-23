@@ -6,12 +6,16 @@ def base():
  return {'horizon_hours':3,'generators':[{'id':'cheap','min_MW':2,'max_MW':8,'marginal_cost':10,'startup_cost':5,'ramp_up_MW':8,'ramp_down_MW':8,'min_up_hours':1,'min_down_hours':1,'initial_state':'off'},{'id':'expensive','min_MW':1,'max_MW':10,'marginal_cost':30,'startup_cost':7,'ramp_up_MW':10,'ramp_down_MW':10,'min_up_hours':1,'min_down_hours':1,'initial_state':'off'}],'storage':{'capacity_MWh':4,'initial_MWh':2,'max_charge_MW':2,'max_discharge_MW':2,'charge_efficiency':0.9,'discharge_efficiency':0.8},'periods':[{'load_MW':6,'renewable_MW':2},{'load_MW':3,'renewable_MW':6},{'load_MW':9,'renewable_MW':1}]}
 def run(d,existing=False):
  with tempfile.TemporaryDirectory() as td:
-  p=Path(td); i=p/'i.json'; o=p/'o.json'; i.write_text(json.dumps(d)); sentinel=b'keep';
+  p=Path(td); i=p/'i.json'; o=p/'o.json'; i.write_text(json.dumps(d)); sentinel=b'keep'
   if existing:o.write_bytes(sentinel)
-  r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True,timeout=20); return r,o.read_bytes() if o.exists() else None,sentinel
+  r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True,timeout=20)
+  artifacts=sorted(x.name for x in p.rglob('*') if x.name not in {'i.json','o.json'})
+  return r,o.read_bytes() if o.exists() else None,sentinel,artifacts
 def good(d=None):
- r,b,_=run(base() if d is None else d); assert r.returncode==0, r.stderr.decode(); return json.loads(b)
-def rec(x): return x['dispatch']
+ r,b,_,_=run(base() if d is None else d)
+ if r.returncode != 0: raise AssertionError(r.stderr.decode())
+ return json.loads(b)
+def rec(x): return x["dispatch"]
 def test_minimum_up_duration_is_respected():
     # CASE-QSC003-01
  """Minimum up duration is maintained after commitment."""
@@ -60,15 +64,15 @@ def test_output_schema_is_exact_and_ordered():
 def test_invalid_input_preserves_absent_output():
     # CASE-QSC003-12
  """Invalid input rejects without creating output."""
- d=base(); d['storage']['charge_efficiency']=0; r,b,_=run(d); assert r.returncode!=0 and b is None
+ d=base(); d['storage']['charge_efficiency']=0; r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a)
 def test_invalid_input_preserves_sentinel():
     # CASE-QSC003-13
  """Invalid input rejects without changing an existing output sentinel."""
- d=base(); d['periods'][1]['load_MW']=-1; r,b,s=run(d,True); assert r.returncode!=0 and b==s
+ d=base(); d['periods'][1]['load_MW']=-1; r,b,s,a=run(d,True); assert r.returncode!=0 and b==s and not any(x.endswith('.tmp') for x in a)
 def test_late_invalid_period_is_atomic():
     # CASE-QSC003-14
  """A late invalid period cannot publish a prefix."""
- d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_=run(d); assert r.returncode!=0 and b is None
+ d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_,a=run(d); assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a)
 
 
 
@@ -103,7 +107,7 @@ def test_on_generator_respects_maximum_output():
 
 def test_repeat_run_is_byte_identical():
     """The same valid input produces byte-identical output on repeat execution."""
-    r1,b1,_=run(base()); r2,b2,_=run(base()); assert r1.returncode==0 and r2.returncode==0 and b1==b2
+    r1,b1,_,_=run(base()); r2,b2,_,_=run(base()); assert r1.returncode==0 and r2.returncode==0 and b1==b2
 
 def test_summary_cost_includes_generation_and_startup():
     """Reported cost is at least the independently recomputed generation cost."""
@@ -113,3 +117,7 @@ def test_absent_parent_directory_is_io_failure():
     """A missing output parent is rejected without creating a side artifact."""
     with tempfile.TemporaryDirectory() as td:
         p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists() and not (p/'missing').exists()
+
+
+
+
