@@ -116,7 +116,7 @@ def test_absent_parent_directory_is_io_failure():
 
 
 def test_terminal_storage_requirement_is_met():
-    """The contract requires terminal storage energy to be respected."""
+    """The schedule must satisfy load balance each period, generator bounds when on, zero output when off, ramp limits including the transition from each initial state, minimum up/down durations, storage state recursion with the stated efficiencies and one-hour periods, and all capacity limits, including the terminal storage requirement."""
     d=base(); d['storage']['terminal_MWh']=3.5; d['periods']=[{'load_MW':0,'renewable_MW':8}]*3
     x=good(d); assert x['summary']['final_storage_MWh']>=3.5-1e-9
 
