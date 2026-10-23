@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
-  "gate_tests": [],
+  "gate_tests": [
+    "test_outputs.py::test_cop_uses_ambient_slope",
+    "test_outputs.py::test_store_recursion_uses_efficiency",
+    "test_outputs.py::test_heat_balance_is_closed",
+    "test_outputs.py::test_repeat_is_byte_identical"
+  ],
   "tests": {
     "test_outputs.py::test_cop_uses_ambient_slope": {
       "priority": "core",
