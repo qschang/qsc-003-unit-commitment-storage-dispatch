@@ -18,62 +18,62 @@ def good(d=None):
 def rec(x): return x["dispatch"]
 # CASE-QSC003-01
 def test_minimum_up_duration_is_respected():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-01: minimum up duration and load balance."""
  x=good(); a=[g['on'] for q in rec(x) for g in q['generators'] if g['id']=='cheap']; assert not (a[0] and not a[1] and 1 < base()['generators'][0]['min_up_hours'])
 # CASE-QSC003-02
 def test_initial_off_state_honors_minimum_down_duration():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-02: initial minimum down duration."""
  d=base(); d['generators'][0]['min_down_hours']=2; d['periods'][0]['load_MW']=0; x=good(d); assert x['dispatch'][0]['generators'][0]['on'] is False
 # CASE-QSC003-03
 def test_ramp_limits_include_initial_transition():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-03: initial ramp transition."""
  d=base(); d['generators'][0]['ramp_up_MW']=3; x=good(d); p=next(g['power_MW'] for g in x['dispatch'][0]['generators'] if g['id']=='cheap'); assert p<=3+1e-9
 # CASE-QSC003-04
 def test_zero_output_when_off():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-04: off generators produce zero."""
  x=good(); assert all(g['power_MW']==0 for q in rec(x) for g in q['generators'] if not g['on'])
 # CASE-QSC003-05
 def test_storage_recurrence_uses_efficiencies():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-05: storage efficiency recurrence."""
  x=good(); s=2.0; q=x['dispatch'][0]; s-=q['storage']['discharge_MW']/0.8; s+=q['storage']['charge_MW']*0.9; assert q['storage']['state_MWh']==pytest.approx(s,abs=1e-9)
 # CASE-QSC003-06
 def test_storage_capacity_is_never_exceeded():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-06: storage capacity bound."""
  x=good(); assert all(0<=q['storage']['state_MWh']<=4+1e-9 for q in rec(x))
 # CASE-QSC003-07
 def test_renewable_is_used_before_thermal():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-07: renewable-first dispatch."""
  d=base(); d['periods']=[{'load_MW':3,'renewable_MW':8}]; d['horizon_hours']=1; x=good(d); assert x['dispatch'][0]['renewable_used_MW']==5 and x['dispatch'][0]['curtailment_MW']>=0
 # CASE-QSC003-08
 def test_unserved_load_is_last_resort_and_penalized():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-08: penalized unserved load."""
  d=base(); d['periods']=[{'load_MW':100,'renewable_MW':0}]; d['horizon_hours']=1; x=good(d); assert x['summary']['total_unserved_MWh']>0 and x['summary']['total_cost']>=10000*x['summary']['total_unserved_MWh']
 # CASE-QSC003-09
 def test_balance_residual_is_zero():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-09: balance residual."""
  x=good(); assert all(abs(q['balance_residual_MW'])<=1e-9 for q in rec(x))
 # CASE-QSC003-10
 def test_summary_commitment_hours_matches_records():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-10: commitment hour summary."""
  x=good();
  for gid,n in x['summary']['commitment_hours'].items(): assert n==sum(g['on'] for q in rec(x) for g in q['generators'] if g['id']==gid)
 # CASE-QSC003-11
 def test_output_schema_is_exact_and_ordered():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-11: exact output schema."""
  x=good(); assert list(x)==['dispatch','summary'] and set(x['dispatch'][0])=={'generators','storage','renewable_used_MW','curtailment_MW','unserved_MW','balance_residual_MW'}
 # CASE-QSC003-12
 def test_invalid_input_preserves_absent_output():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-12: invalid input absent output."""
  d=base(); d['storage']['charge_efficiency']=0; r,b,_,a=run(d)
  assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a) and not any('report' in x or 'log' in x or 'ledger' in x or 'summary' in x or 'checkpoint' in x for x in a)
 # CASE-QSC003-13
 def test_invalid_input_preserves_sentinel():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-13: invalid input sentinel preservation."""
  d=base(); d['periods'][1]['load_MW']=-1; r,b,s,a=run(d,True)
  assert r.returncode!=0 and b==s and not any(x.endswith('.tmp') for x in a) and not any('report' in x or 'log' in x or 'ledger' in x or 'summary' in x or 'checkpoint' in x for x in a)
 # CASE-QSC003-14
 def test_late_invalid_period_is_atomic():
- """The contract requires `load balance each period`."""
+ """CASE-QSC003-14: late invalid period atomicity."""
  d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_,a=run(d)
  assert r.returncode!=0 and b is None and not any(x.endswith('.tmp') for x in a) and not any('report' in x or 'log' in x or 'ledger' in x or 'summary' in x or 'checkpoint' in x for x in a)
 
@@ -81,49 +81,49 @@ def test_late_invalid_period_is_atomic():
 
 # CASE-QSC003-15
 def test_initial_on_minimum_up_is_enforced_for_zero_load():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-15: initial on minimum up duration."""
     d=base(); d['horizon_hours']=3; d['periods']=[{'load_MW':0,'renewable_MW':0}]*3; d['generators'][0]['initial_state']='on'; d['generators'][0]['min_up_hours']=2
     x=good(d); states=[q['generators'][0]['on'] for q in rec(x)]; assert states[:2]==[True,True]
 
 # CASE-QSC003-16
 def test_initial_off_minimum_down_blocks_startup():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-16: initial off startup block."""
     d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0}]*2; d['generators'][0]['min_down_hours']=2
     x=good(d); assert [q['generators'][0]['on'] for q in rec(x)]==[False,False]
 
 # CASE-QSC003-17
 def test_ramp_down_is_checked_between_periods():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-17: inter-period ramp down."""
     d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0},{'load_MW':7,'renewable_MW':0}]; d['generators'][0]['initial_state']='on'; d['generators'][0]['min_up_hours']=2; d['generators'][0]['ramp_down_MW']=1
     x=good(d); p=[g['power_MW'] for q in rec(x) for g in q['generators'] if g['id']=='cheap']; assert p[0]-p[1]<=1+1e-9
 
 # CASE-QSC003-18
 def test_on_generator_respects_minimum_output():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-18: minimum generator output."""
     x=good();
     vals=[g['power_MW']-({'cheap':2,'expensive':1}[g['id']]-1e-9) for q in rec(x) for g in q['generators'] if g['on']]
     assert vals and min(vals)>=0
 
 # CASE-QSC003-19
 def test_on_generator_respects_maximum_output():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-19: maximum generator output."""
     x=good();
     vals=[({'cheap':8,'expensive':10}[g['id']]+1e-9)-g['power_MW'] for q in rec(x) for g in q['generators'] if g['on']]
     assert vals and min(vals)>=0
 
 # CASE-QSC003-20
 def test_repeat_run_is_byte_identical():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-20: deterministic repeat bytes."""
     r1,b1,_,_=run(base()); r2,b2,_,_=run(base()); assert r1.returncode==0 and r2.returncode==0 and b1==b2
 
 # CASE-QSC003-21
 def test_summary_cost_includes_generation_and_startup():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-21: generation and startup cost."""
     x=good(); gen=sum(g['power_MW']*({'cheap':10,'expensive':30}[g['id']]) for q in rec(x) for g in q['generators']); assert x['summary']['total_cost']>=gen-1e-9
 
 # CASE-QSC003-22
 def test_absent_parent_directory_is_io_failure():
-    """The contract requires `load balance each period`."""
+    """CASE-QSC003-22: missing parent IO failure."""
     with tempfile.TemporaryDirectory() as td:
         p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True)
         assert r.returncode!=0 and not o.exists() and not (p/'missing').exists() and not (p/'missing').exists() and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*')) and not list(p.rglob('*log*')) and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*'))
@@ -140,7 +140,7 @@ def test_absent_parent_directory_is_io_failure():
 
 # CASE-QSC003-23
 def test_terminal_storage_requirement_is_met():
-    """`The schedule must satisfy load balance each period, generator bounds when on, zero output when off, ramp limits including the transition from each initial state, minimum up/down durations, storage state recursion with the stated efficiencies and one-hour periods, and all capacity limits, including the terminal storage requirement.`"""
+    """CASE-QSC003-23: terminal storage requirement."""
     d=base(); d['storage']['terminal_MWh']=3.5; d['periods']=[{'load_MW':0,'renewable_MW':8}]*3
     x=good(d); assert x['summary']['final_storage_MWh']>=3.5-1e-9
 
@@ -148,5 +148,5 @@ def test_terminal_storage_requirement_is_met():
 
 # CASE-QSC003-24
 def test_efficiency_upper_boundary_is_valid():
-    """The input is UTF-8 JSON with `horizon_hours`, `generators`, `storage`, and `periods`."""
+    """CASE-QSC003-24: efficiency upper boundary."""
     d=base(); d['storage']['charge_efficiency']=1.0; d['storage']['discharge_efficiency']=1.0; x=good(d); assert x['summary']['final_storage_MWh']>=0
