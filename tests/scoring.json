@@ -1,103 +1,88 @@
 {
   "schema_version": 1,
   "gate_tests": [
-    "test_outputs.py::test_minimum_up_duration_is_respected",
-    "test_outputs.py::test_initial_off_state_honors_minimum_down_duration",
-    "test_outputs.py::test_ramp_limits_include_initial_transition",
-    "test_outputs.py::test_zero_output_when_off",
-    "test_outputs.py::test_storage_recurrence_uses_efficiencies",
-    "test_outputs.py::test_storage_capacity_is_never_exceeded"
+    "test_outputs.py::test_cop_uses_ambient_slope",
+    "test_outputs.py::test_heat_pump_is_unavailable_below_threshold",
+    "test_outputs.py::test_boiler_heat_respects_limit",
+    "test_outputs.py::test_store_recursion_uses_efficiency",
+    "test_outputs.py::test_store_capacity_and_terminal_state",
+    "test_outputs.py::test_heat_balance_is_closed"
   ],
   "tests": {
-    "test_outputs.py::test_renewable_is_used_before_thermal": {
+    "test_outputs.py::test_cop_uses_ambient_slope": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_unserved_load_is_last_resort_and_penalized": {
+    "test_outputs.py::test_heat_pump_is_unavailable_below_threshold": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_balance_residual_is_zero": {
+    "test_outputs.py::test_boiler_heat_respects_limit": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_summary_commitment_hours_matches_records": {
+    "test_outputs.py::test_store_recursion_uses_efficiency": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_output_schema_is_exact_and_ordered": {
+    "test_outputs.py::test_store_capacity_and_terminal_state": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_invalid_input_preserves_absent_output": {
+    "test_outputs.py::test_heat_balance_is_closed": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
+    },
+    "test_outputs.py::test_cost_contains_fuel_electricity_and_penalty": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
+    },
+    "test_outputs.py::test_output_shape_is_exact": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
+    },
+    "test_outputs.py::test_repeat_is_byte_identical": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
+    },
+    "test_outputs.py::test_duplicate_key_is_rejected": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
     "test_outputs.py::test_invalid_input_preserves_sentinel": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_late_invalid_period_is_atomic": {
+    "test_outputs.py::test_late_invalid_record_is_atomic": {
       "priority": "core",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_initial_on_minimum_up_is_enforced_for_zero_load": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_initial_off_minimum_down_blocks_startup": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_ramp_down_is_checked_between_periods": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_on_generator_respects_minimum_output": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_on_generator_respects_maximum_output": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_repeat_run_is_byte_identical": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_summary_cost_includes_generation_and_startup": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_absent_parent_directory_is_io_failure": {
-      "priority": "supporting",
-      "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.05882353
-    },
-    "test_outputs.py::test_terminal_storage_requirement_is_met": {
+    "test_outputs.py::test_missing_parent_directory_is_rejected": {
       "priority": "core",
-      "rationale": "independent terminal-state contract axis",
-      "weight": 0.04882352
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     },
-    "test_outputs.py::test_efficiency_upper_boundary_is_valid": {
-      "priority": "supporting",
-      "rationale": "inclusive numeric boundary",
-      "weight": 0.01
+    "test_outputs.py::test_efficiency_boundary_one_is_valid": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
+    },
+    "test_outputs.py::test_boolean_numeric_is_rejected": {
+      "priority": "core",
+      "rationale": "direct domain assertion",
+      "weight": 0.06666667
     }
   },
   "weight_policy": {

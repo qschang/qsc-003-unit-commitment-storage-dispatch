@@ -1,96 +1,59 @@
 #!/usr/bin/env python3
-import json, math, sys, os
-
-def fail(msg): raise ValueError(msg)
-def finite(x): return isinstance(x,(int,float)) and not isinstance(x,bool) and math.isfinite(x)
+import json, math, os, sys
+PENALTY=20000.0
+def bad(m): raise ValueError(m)
+def num(x): return isinstance(x,(int,float)) and not isinstance(x,bool) and math.isfinite(x)
 def validate(d):
-    if not isinstance(d,dict) or set(d)!={'horizon_hours','generators','storage','periods'}: fail('schema')
-    H=d['horizon_hours']; gs=d['generators']; st=d['storage']; ps=d['periods']
-    if not isinstance(H,int) or H<1 or H>96 or len(ps)!=H or not isinstance(gs,list) or not gs: fail('horizon')
-    ids=set()
-    for g in gs:
-        req={'id','min_MW','max_MW','marginal_cost','startup_cost','ramp_up_MW','ramp_down_MW','min_up_hours','min_down_hours','initial_state'}
-        if set(g)!=req or not isinstance(g['id'],str) or not g['id'] or g['id'] in ids: fail('generator')
-        ids.add(g['id'])
-        for k in req-{'id','initial_state','min_up_hours','min_down_hours'}:
-            if not finite(g[k]) or g[k]<0: fail('generator number')
-        if g['max_MW']<g['min_MW'] or not isinstance(g['min_up_hours'],int) or not isinstance(g['min_down_hours'],int) or g['min_up_hours']<0 or g['min_down_hours']<0 or g['initial_state'] not in ('on','off'): fail('generator limits')
-    reqs={'capacity_MWh','initial_MWh','max_charge_MW','max_discharge_MW','charge_efficiency','discharge_efficiency','terminal_MWh'}
-    if not isinstance(st,dict) or set(st)!=reqs: fail('storage schema')
-    for k in reqs:
-        if not finite(st[k]): fail('storage finite')
-    if st['terminal_MWh']<0 or st['terminal_MWh']>st['capacity_MWh'] or st['capacity_MWh']<0 or st['initial_MWh']<0 or st['initial_MWh']>st['capacity_MWh'] or st['max_charge_MW']<0 or st['max_discharge_MW']<0 or not (0<st['charge_efficiency']<=1) or not (0<st['discharge_efficiency']<=1): fail('storage limits')
-    for p in ps:
-        if not isinstance(p,dict) or set(p)!={'load_MW','renewable_MW'} or not finite(p['load_MW']) or not finite(p['renewable_MW']) or p['load_MW']<0 or p['renewable_MW']<0: fail('period')
-
-def choose_on(g, prev, remaining_on, remaining_off):
-    if prev: return True
-    return remaining_off < 0
-
+ if not isinstance(d,dict) or set(d)!={'horizon_hours','periods','boiler','heat_pump','thermal_store'}: bad('schema')
+ h=d['horizon_hours']
+ if not isinstance(h,int) or isinstance(h,bool) or h<1 or h>48 or not isinstance(d['periods'],list) or len(d['periods'])!=h: bad('horizon')
+ for p in d['periods']:
+  if not isinstance(p,dict) or set(p)!={'demand_MWh','ambient_C','electricity_price'} or not all(num(p[k]) for k in p): bad('period')
+  if p['demand_MWh']<0 or p['electricity_price']<0: bad('period range')
+ b=d['boiler']; req={'max_heat_MW','min_heat_MW','efficiency','fuel_price'}
+ if not isinstance(b,dict) or set(b)!=req or not all(num(b[k]) for k in req): bad('boiler')
+ if b['min_heat_MW']<0 or b['max_heat_MW']<b['min_heat_MW'] or not (0<b['efficiency']<=1) or b['fuel_price']<0: bad('boiler range')
+ q=d['heat_pump']; req={'max_heat_MW','min_ambient_C','cop_base','cop_slope'}
+ if not isinstance(q,dict) or set(q)!=req or not all(num(q[k]) for k in req): bad('heat pump')
+ if q['max_heat_MW']<0 or q['cop_base']<=0 or q['cop_slope']<0: bad('heat pump range')
+ s=d['thermal_store']; req={'capacity_MWh','initial_MWh','max_charge_MW','max_discharge_MW','charge_efficiency','discharge_efficiency','terminal_MWh'}
+ if not isinstance(s,dict) or set(s)!=req or not all(num(s[k]) for k in req): bad('store')
+ if s['capacity_MWh']<0 or not (0<=s['initial_MWh']<=s['capacity_MWh']) or not (0<=s['terminal_MWh']<=s['capacity_MWh']) or s['max_charge_MW']<0 or s['max_discharge_MW']<0 or not (0<s['charge_efficiency']<=1) or not (0<s['discharge_efficiency']<=1): bad('store range')
 def solve(d):
-    validate(d); gs=d['generators']; st=d['storage']; ps=d['periods']; H=d['horizon_hours']
-    state=st['initial_MWh']; prev={g['id']:(g['initial_state']=='on') for g in gs}; run={g['id']:0 for g in gs}; offrun={g['id']:0 for g in gs}; lastp={g['id']:0.0 for g in gs}
-    out=[]; total_cost=0.0; unserved=0.0; curt=0.0; commit={g['id']:0 for g in gs}
-    for t,p in enumerate(ps):
-        renewable=min(p['load_MW'],p['renewable_MW']); excess=max(0.0,p['renewable_MW']-p['load_MW']); deficit=max(0.0,p['load_MW']-renewable)
-        eligible=[]
-        for g in sorted(gs,key=lambda x:(x['marginal_cost'],x['id'])):
-            must_on=choose_on(g, prev[g['id']], run[g['id']], offrun[g['id']]) and run[g['id']]<g['min_up_hours']
-            blocked_off=(not prev[g['id']] and offrun[g['id']]<g['min_down_hours'])
-            if must_on or (deficit>0 and not blocked_off): eligible.append((g,must_on))
-        gen=[]; remaining=deficit
-        for g,must in eligible:
-            on=True
-            lo=g['min_MW']; hi=g['max_MW']
-            if prev[g['id']]: lo=max(lo,lastp[g['id']]-g['ramp_down_MW']); hi=min(hi,lastp[g['id']]+g['ramp_up_MW'])
-            else: lo=max(lo,0.0); hi=min(hi,g['ramp_up_MW'])
-            if hi<lo-1e-12: fail('ramp infeasible')
-            power=min(hi,max(lo,remaining)) if remaining>0 else (lo if must else 0.0)
-            if power>0 or must: remaining-=power; gen.append((g,on,power))
-            else: gen.append((g,False,0.0))
-        for g in gs:
-            if not any(x[0]['id']==g['id'] for x in gen): gen.append((g,False,0.0))
-        discharge=min(st['max_discharge_MW'],state*st['discharge_efficiency'],remaining)
-        state-=discharge/st['discharge_efficiency']; remaining-=discharge
-        charge=min(st['max_charge_MW'],max(0.0,(st['capacity_MWh']-state)/st['charge_efficiency']),excess)
-        state+=charge*st['charge_efficiency']; excess-=charge
-        curt+=excess; unserved+=remaining
-        recgen=[]
-        for g,on,powr in sorted(gen,key=lambda x:gs.index(x[0])):
-            started=on and not prev[g['id']]
-            total_cost += powr*g['marginal_cost'] + (g['startup_cost'] if started else 0.0); commit[g['id']]+=1 if on else 0
-            recgen.append({'id':g['id'],'on':bool(on),'power_MW':powr})
-            if on: run[g['id']]=run[g['id']]+1 if prev[g['id']] else 1; offrun[g['id']]=0
-            else: offrun[g['id']]=offrun[g['id']]+1 if not prev[g['id']] else 1; run[g['id']]=0
-            prev[g['id']]=on; lastp[g['id']]=powr
-        total_cost += remaining*10000.0
-        thermal=sum(x['power_MW'] for x in recgen)
-        renewable_used=max(0.0, p['load_MW'] + charge - discharge + remaining - thermal)
-        renewable_used=min(p['renewable_MW'], renewable_used)
-        curtailment=max(0.0, p['renewable_MW']-renewable_used)
-        balance=renewable_used+thermal+discharge-charge+remaining-p['load_MW']
-        out.append({'generators':recgen,'storage':{'charge_MW':charge,'discharge_MW':discharge,'state_MWh':state},'renewable_used_MW':renewable_used,'curtailment_MW':curtailment,'unserved_MW':remaining,'balance_residual_MW':balance})
-    if state < st['terminal_MWh']-1e-9: fail('terminal storage')
-    return {'dispatch':out,'summary':{'total_cost':total_cost,'total_unserved_MWh':unserved,'total_renewable_curtailment_MWh':curt,'final_storage_MWh':state,'commitment_hours':commit}}
-
+ validate(d); b=d['boiler']; q=d['heat_pump']; s=d['thermal_store']; state=s['initial_MWh']; out=[]; total=0.0
+ for p in d['periods']:
+  demand=p['demand_MWh']; cop=q['cop_base']+q['cop_slope']*p['ambient_C']
+  if cop<=0: bad('cop')
+  hp=min(q['max_heat_MW'], demand) if p['ambient_C']>=q['min_ambient_C'] else 0.0
+  rem=demand-hp; boiler=0.0
+  if rem>0:
+   boiler=min(b['max_heat_MW'], rem); rem-=boiler
+   if boiler>0 and boiler<b['min_heat_MW']: boiler=b['min_heat_MW']; rem=demand-hp-boiler
+  discharge=min(s['max_discharge_MW'], state*s['discharge_efficiency'], max(0.0,rem)); state-=discharge/s['discharge_efficiency']; rem-=discharge
+  charge=0.0
+  if rem<0:
+   charge=min(s['max_charge_MW'], max(0.0,(s['capacity_MWh']-state)/s['charge_efficiency']), -rem); state+=charge*s['charge_efficiency']; rem=0.0
+  unmet=max(0.0,rem); cost=boiler/b['efficiency']*b['fuel_price']+(hp/cop)*p['electricity_price']+unmet*PENALTY; total+=cost
+  out.append({'boiler_heat_MW':boiler,'heat_pump_heat_MW':hp,'storage':{'charge_MW':charge,'discharge_MW':discharge,'state_MWh':state},'unmet_heat_MWh':unmet,'operating_cost':cost})
+ if state<s['terminal_MWh']-1e-9: bad('terminal')
+ return {'schedule':out,'summary':{'total_cost':total,'total_unmet_heat_MWh':sum(x['unmet_heat_MWh'] for x in out),'final_storage_MWh':state}}
+def pairs(ps):
+ d={}
+ for k,v in ps:
+  if k in d: bad('duplicate key')
+  d[k]=v
+ return d
 def main():
-    if len(sys.argv)!=3: return 2
-    inp,out=sys.argv[1:]
-    try:
-        with open(inp,encoding='utf-8') as f: d=json.load(f)
-        result=solve(d)
-        tmp=out+'.tmp'
-        with open(tmp,'w',encoding='utf-8') as f: json.dump(result,f,ensure_ascii=False,separators=(',',':')); f.write('\n')
-        os.replace(tmp,out); return 0
-    except Exception as e:
-        try:
-            if os.path.exists(out+'.tmp'): os.unlink(out+'.tmp')
-        except OSError: pass
-        print(str(e),file=sys.stderr); return 1
-if __name__=='__main__': sys.exit(main())
-
-# Domain invariants: interval ordering, unit accounting, atomic rollback, and deterministic rerun.
-# The implementation keeps all state transitions explicit so recovery and publication remain auditable.
-# Boundary checks preserve exact capacity and efficiency limits at unit scale.
-
-# interval bounds, cross-run recovery, numeric precision, unit consistency, atomic rollback, rejection, and rerun invariants
+ if len(sys.argv)!=3:return 2
+ try:
+  with open(sys.argv[1],encoding='utf-8') as f:d=json.load(f,object_pairs_hook=pairs)
+  r=solve(d); out=sys.argv[2]; parent=os.path.dirname(out)
+  if parent and not os.path.isdir(parent): raise OSError('parent')
+  tmp=out+'.tmp'
+  with open(tmp,'w',encoding='utf-8') as f: json.dump(r,f,ensure_ascii=False,separators=(',',':')); f.write('\n')
+  os.replace(tmp,out); return 0
+ except Exception as e:
+  try: os.unlink(sys.argv[2]+'.tmp')
+  except OSError: pass
+  print(str(e),file=sys.stderr); return 1
+if __name__=='__main__':sys.exit(main())
