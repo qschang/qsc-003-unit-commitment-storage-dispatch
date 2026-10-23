@@ -103,7 +103,8 @@ def test_summary_cost_includes_generation_and_startup():
 def test_absent_parent_directory_is_io_failure():
     """The contract requires `load balance each period`."""
     with tempfile.TemporaryDirectory() as td:
-        p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists() and not (p/'missing').exists() and not (p/'missing').exists() and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*')) and not list(p.rglob('*log*')) and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*'))
+        p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True)
+        assert r.returncode!=0 and not o.exists() and not (p/'missing').exists() and not (p/'missing').exists() and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*')) and not list(p.rglob('*log*')) and not list(p.rglob('*.tmp')) and not list(p.rglob('*report*')) and not list(p.rglob('*ledger*')) and not list(p.rglob('*summary*')) and not list(p.rglob('*checkpoint*'))
 
 
 
