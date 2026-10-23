@@ -17,7 +17,7 @@ timeout --signal=TERM --kill-after=10s 300s python3 -B -I -m pytest -q -p no:cac
 rc=$?
 set -e
 if [ "$rc" -ne 0 ] || [ ! -s "$REPORT_TMP" ]; then exit 1; fi
-python3 -B -I /tests/verify_junit.py "$REPORT_TMP"
+python3 -B -I /tests/verify_junit.py "$REPORT_TMP" /tests/scoring.json
 python3 -B -I /tests/score.py --config /tests/scoring.json --junit "$REPORT_TMP" --report-out /logs/verifier/scoring-report.json --reward-out "$REWARD_FILE"
 mv -f "$REPORT_TMP" "$REPORT"
 complete=1
