@@ -6,8 +6,10 @@ gates=list(cfg.get('gate_tests',[])); expected=gates+list(cfg.get('tests',{})); 
 score=1.0 if ok else 0.0
 import os
 os.makedirs(os.path.dirname(a.reward_out) or '.', exist_ok=True)
-os.chmod(a.reward_out,0o644)
+
+if os.path.exists(a.reward_out): os.chmod(a.reward_out,0o644)
 json.dump({'score':score,'expected_tests':len(expected),'observed_tests':len(cases),'gate_tests':gates,'passed':ok},open(a.report_out,'w',encoding='utf-8'),sort_keys=True)
 with open(a.reward_out,'w',encoding='utf-8') as f:f.write(f'{score:.3f}\n')
-os.chmod(a.reward_out,0o444)
+
+if os.path.exists(a.reward_out): os.chmod(a.reward_out,0o444)
 raise SystemExit(0 if ok else 1)
