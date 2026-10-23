@@ -121,3 +121,8 @@ def test_terminal_storage_requirement_is_met():
     d=base(); d['storage']['terminal_MWh']=3.5; d['periods']=[{'load_MW':0,'renewable_MW':8}]*3
     x=good(d); assert x['summary']['final_storage_MWh']>=3.5-1e-9
 
+
+
+def test_efficiency_upper_boundary_is_valid():
+    """The contract accepts unit efficiency at its inclusive upper boundary."""
+    d=base(); d['storage']['charge_efficiency']=1.0; d['storage']['discharge_efficiency']=1.0; x=good(d); assert x['summary']['final_storage_MWh']>=0

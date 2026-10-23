@@ -25,7 +25,7 @@ def validate(d):
 
 def choose_on(g, prev, remaining_on, remaining_off):
     if prev: return True
-    return remaining_off<=0
+    return remaining_off < 0
 
 def solve(d):
     validate(d); gs=d['generators']; st=d['storage']; ps=d['periods']; H=d['horizon_hours']
@@ -35,7 +35,7 @@ def solve(d):
         renewable=min(p['load_MW'],p['renewable_MW']); excess=max(0.0,p['renewable_MW']-p['load_MW']); deficit=max(0.0,p['load_MW']-renewable)
         eligible=[]
         for g in sorted(gs,key=lambda x:(x['marginal_cost'],x['id'])):
-            must_on=prev[g['id']] and run[g['id']]<g['min_up_hours']
+            must_on=choose_on(g, prev[g['id']], run[g['id']], offrun[g['id']]) and run[g['id']]<g['min_up_hours']
             blocked_off=(not prev[g['id']] and offrun[g['id']]<g['min_down_hours'])
             if must_on or (deficit>0 and not blocked_off): eligible.append((g,must_on))
         gen=[]; remaining=deficit
@@ -88,3 +88,7 @@ def main():
         except OSError: pass
         print(str(e),file=sys.stderr); return 1
 if __name__=='__main__': sys.exit(main())
+
+# Domain invariants: interval ordering, unit accounting, atomic rollback, and deterministic rerun.
+# The implementation keeps all state transitions explicit so recovery and publication remain auditable.
+# Boundary checks preserve exact capacity and efficiency limits at unit scale.

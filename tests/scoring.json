@@ -93,6 +93,11 @@
       "priority": "core",
       "rationale": "independent terminal-state contract axis",
       "weight": 0.05882352
+    },
+    "test_outputs.py::test_efficiency_upper_boundary_is_valid": {
+      "priority": "supporting",
+      "rationale": "inclusive numeric boundary",
+      "weight": -0.0
     }
   },
   "weight_policy": {
