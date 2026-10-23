@@ -15,11 +15,11 @@ def validate(d):
         for k in req-{'id','initial_state','min_up_hours','min_down_hours'}:
             if not finite(g[k]) or g[k]<0: fail('generator number')
         if g['max_MW']<g['min_MW'] or not isinstance(g['min_up_hours'],int) or not isinstance(g['min_down_hours'],int) or g['min_up_hours']<0 or g['min_down_hours']<0 or g['initial_state'] not in ('on','off'): fail('generator limits')
-    reqs={'capacity_MWh','initial_MWh','max_charge_MW','max_discharge_MW','charge_efficiency','discharge_efficiency'}
+    reqs={'capacity_MWh','initial_MWh','max_charge_MW','max_discharge_MW','charge_efficiency','discharge_efficiency','terminal_MWh'}
     if not isinstance(st,dict) or set(st)!=reqs: fail('storage schema')
     for k in reqs:
         if not finite(st[k]): fail('storage finite')
-    if st['capacity_MWh']<0 or st['initial_MWh']<0 or st['initial_MWh']>st['capacity_MWh'] or st['max_charge_MW']<0 or st['max_discharge_MW']<0 or not (0<st['charge_efficiency']<=1) or not (0<st['discharge_efficiency']<=1): fail('storage limits')
+    if st['terminal_MWh']<0 or st['terminal_MWh']>st['capacity_MWh'] or st['capacity_MWh']<0 or st['initial_MWh']<0 or st['initial_MWh']>st['capacity_MWh'] or st['max_charge_MW']<0 or st['max_discharge_MW']<0 or not (0<st['charge_efficiency']<=1) or not (0<st['discharge_efficiency']<=1): fail('storage limits')
     for p in ps:
         if not isinstance(p,dict) or set(p)!={'load_MW','renewable_MW'} or not finite(p['load_MW']) or not finite(p['renewable_MW']) or p['load_MW']<0 or p['renewable_MW']<0: fail('period')
 
@@ -70,6 +70,7 @@ def solve(d):
         curtailment=max(0.0, p['renewable_MW']-renewable_used)
         balance=renewable_used+thermal+discharge-charge+remaining-p['load_MW']
         out.append({'generators':recgen,'storage':{'charge_MW':charge,'discharge_MW':discharge,'state_MWh':state},'renewable_used_MW':renewable_used,'curtailment_MW':curtailment,'unserved_MW':remaining,'balance_residual_MW':balance})
+    if state < st['terminal_MWh']-1e-9: fail('terminal storage')
     return {'dispatch':out,'summary':{'total_cost':total_cost,'total_unserved_MWh':unserved,'total_renewable_curtailment_MWh':curt,'final_storage_MWh':state,'commitment_hours':commit}}
 
 def main():

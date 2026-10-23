@@ -88,6 +88,11 @@
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
       "weight": 0.0625
+    },
+    "test_outputs.py::test_terminal_storage_requirement_is_met": {
+      "priority": "core",
+      "rationale": "independent terminal-state contract axis",
+      "weight": 0.0625
     }
   },
   "weight_policy": {
@@ -96,4 +101,3 @@
     "version": 1
   }
 }
-
