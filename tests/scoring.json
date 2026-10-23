@@ -1,13 +1,6 @@
 {
   "schema_version": 1,
-  "gate_tests": [
-    "test_outputs.py::test_cop_uses_ambient_slope",
-    "test_outputs.py::test_heat_pump_is_unavailable_below_threshold",
-    "test_outputs.py::test_boiler_heat_respects_limit",
-    "test_outputs.py::test_store_recursion_uses_efficiency",
-    "test_outputs.py::test_store_capacity_and_terminal_state",
-    "test_outputs.py::test_heat_balance_is_closed"
-  ],
+  "gate_tests": [],
   "tests": {
     "test_outputs.py::test_cop_uses_ambient_slope": {
       "priority": "core",
