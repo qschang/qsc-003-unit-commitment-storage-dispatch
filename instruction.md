@@ -15,3 +15,5 @@ The schedule must satisfy load balance each period, generator bounds when on, ze
 Reject malformed, non-finite, negative, inconsistent, or horizon-violating inputs with a nonzero exit and leave `OUTPUT.json` absent or byte-for-byte unchanged. Validate the complete record before publishing any output. Numeric fields must be finite; residual magnitude must be at most `1e-9` MW and storage state at most `1e-9` MWh from the stated recurrence. The implementation must handle newly constructed valid systems, not a single fixture.
 
 The contract also requires exact unit accounting, interval ordering, atomic rollback on publication failure, and deterministic rerun behavior; malformed records must be refused without temporary or checkpoint artifacts; preserve numeric precision, interval ordering, and unit consistency during every rerun.
+
+领域约束包括：机组承诺的最小开停机区间与爬坡边界；储能容量、充放电效率、终端库存和单位换算；成本、启动费、弃电与缺供罚金的确定性排序；非有限数值、精度、重复运行、原子回滚、拒收和旧文件保留。

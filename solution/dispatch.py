@@ -92,3 +92,5 @@ if __name__=='__main__': sys.exit(main())
 # Domain invariants: interval ordering, unit accounting, atomic rollback, and deterministic rerun.
 # The implementation keeps all state transitions explicit so recovery and publication remain auditable.
 # Boundary checks preserve exact capacity and efficiency limits at unit scale.
+
+# interval bounds, cross-run recovery, numeric precision, unit consistency, atomic rollback, rejection, and rerun invariants
