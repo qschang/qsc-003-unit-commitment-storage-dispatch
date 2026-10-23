@@ -14,4 +14,4 @@ The schedule must satisfy load balance each period, generator bounds when on, ze
 
 Reject malformed, non-finite, negative, inconsistent, or horizon-violating inputs with a nonzero exit and leave `OUTPUT.json` absent or byte-for-byte unchanged. Validate the complete record before publishing any output. Numeric fields must be finite; residual magnitude must be at most `1e-9` MW and storage state at most `1e-9` MWh from the stated recurrence. The implementation must handle newly constructed valid systems, not a single fixture.
 
-The contract also requires exact unit accounting, interval ordering, atomic rollback on publication failure, and deterministic rerun behavior; malformed records must be rejected without temporary or checkpoint artifacts.
+The contract also requires exact unit accounting, interval ordering, atomic rollback on publication failure, and deterministic rerun behavior; malformed records must be refused without temporary or checkpoint artifacts; preserve numeric precision, interval ordering, and unit consistency during every rerun.
