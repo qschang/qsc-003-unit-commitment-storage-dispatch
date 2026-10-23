@@ -82,3 +82,10 @@ def test_initial_inventory_zero_boundary_is_accepted():
 def test_capacity_upper_boundary_is_accepted():
     """CASE-QSC003-BOUND-04: capacity upper bound is accepted."""
     d=base(); d['thermal_store'].update({'capacity_MWh':1,'initial_MWh':1,'terminal_MWh':1,'max_charge_MW':0,'max_discharge_MW':0}); d['periods']=[{'demand_MWh':0,'ambient_C':10,'electricity_price':0}]*3; assert good(d)['summary']['final_storage_MWh']==pytest.approx(1)
+
+def test_heat_pump_threshold_is_inclusive():
+    """CASE-QSC003-HP-03: threshold equality enables heat pump."""
+    d=base(); d['horizon_hours']=1; d['periods']=[{'demand_MWh':1,'ambient_C':7,'electricity_price':100}]; assert good(d)['schedule'][0]['heat_pump_heat_MW']==pytest.approx(1)
+def test_efficiency_upper_boundary_is_inclusive():
+    """CASE-QSC003-BOUND-05: efficiency one is accepted."""
+    d=base(); d['thermal_store']['charge_efficiency']=1.0; d['thermal_store']['discharge_efficiency']=1.0; assert 'schedule' in good(d)

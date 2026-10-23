@@ -96,6 +96,16 @@
       "priority": "core",
       "rationale": "direct inclusive boundary assertion",
       "weight": 0.04
+    },
+    "test_outputs.py::test_heat_pump_threshold_is_inclusive": {
+      "priority": "core",
+      "rationale": "direct inclusive boundary assertion",
+      "weight": 0.04
+    },
+    "test_outputs.py::test_efficiency_upper_boundary_is_inclusive": {
+      "priority": "core",
+      "rationale": "direct inclusive boundary assertion",
+      "weight": 0.04
     }
   },
   "weight_policy": {
