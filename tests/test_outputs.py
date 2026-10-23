@@ -67,3 +67,7 @@ def test_efficiency_boundary_one_is_valid():
 def test_boolean_numeric_is_rejected():
  """CASE-QSC003-REJECT-04: booleans are not numbers."""
  d=base(); d['boiler']['efficiency']=True; r,b,_,_=run(d); assert r.returncode!=0 and b is None
+
+def test_zero_efficiency_is_rejected():
+    """CASE-QSC003-REJECT-05: zero store efficiency is invalid."""
+    d=base(); d['thermal_store']['charge_efficiency']=0; r,b,_,_=run(d); assert r.returncode!=0 and b is None
