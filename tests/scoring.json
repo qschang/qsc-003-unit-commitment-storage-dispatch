@@ -32,7 +32,7 @@
       "rationale": "direct domain assertion",
       "weight": 0.06666667
     },
-    "test_outputs.py::test_cost_contains_fuel_electricity_and_penalty": {
+    "test_outputs.py::test_cost_contains_penalty": {
       "priority": "core",
       "rationale": "direct domain assertion",
       "weight": 0.06666667
@@ -62,7 +62,7 @@
       "rationale": "direct domain assertion",
       "weight": 0.06666667
     },
-    "test_outputs.py::test_missing_parent_directory_is_rejected": {
+    "test_outputs.py::test_missing_parent_is_rejected": {
       "priority": "core",
       "rationale": "direct domain assertion",
       "weight": 0.06666667
