@@ -84,7 +84,7 @@ def test_initial_off_minimum_down_blocks_startup():
 
 def test_ramp_down_is_checked_between_periods():
     """A running unit cannot reduce output faster than its ramp-down limit."""
-    d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0},{'load_MW':0,'renewable_MW':0}]; d['generators'][0]['initial_state']='on'; d['generators'][0]['ramp_down_MW']=1
+    d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0},{'load_MW':7,'renewable_MW':0}]; d['generators'][0]['initial_state']='on'; d['generators'][0]['min_up_hours']=2; d['generators'][0]['ramp_down_MW']=1
     x=good(d); p=[g['power_MW'] for q in rec(x) for g in q['generators'] if g['id']=='cheap']; assert p[0]-p[1]<=1+1e-9
 
 def test_on_generator_respects_minimum_output():
