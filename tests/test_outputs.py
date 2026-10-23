@@ -83,16 +83,14 @@ def test_ramp_down_is_checked_between_periods():
 def test_on_generator_respects_minimum_output():
     """The contract requires `load balance each period`."""
     x=good();
-    for q in rec(x):
-        for g in q['generators']:
-            if g['on']: assert g['power_MW']>=({'cheap':2,'expensive':1}[g['id']]-1e-9)
+    vals=[g['power_MW']-({'cheap':2,'expensive':1}[g['id']]-1e-9) for q in rec(x) for g in q['generators'] if g['on']]
+    assert vals and min(vals)>=0
 
 def test_on_generator_respects_maximum_output():
     """The contract requires `load balance each period`."""
     x=good();
-    for q in rec(x):
-        for g in q['generators']:
-            if g['on']: assert g['power_MW']<=({'cheap':8,'expensive':10}[g['id']]+1e-9)
+    vals=[({'cheap':8,'expensive':10}[g['id']]+1e-9)-g['power_MW'] for q in rec(x) for g in q['generators'] if g['on']]
+    assert vals and min(vals)>=0
 
 def test_repeat_run_is_byte_identical():
     """The contract requires `load balance each period`."""

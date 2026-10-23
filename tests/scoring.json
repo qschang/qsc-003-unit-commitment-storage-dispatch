@@ -12,87 +12,87 @@
     "test_outputs.py::test_renewable_is_used_before_thermal": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_unserved_load_is_last_resort_and_penalized": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_balance_residual_is_zero": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_summary_commitment_hours_matches_records": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_output_schema_is_exact_and_ordered": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_invalid_input_preserves_absent_output": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_invalid_input_preserves_sentinel": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_late_invalid_period_is_atomic": {
       "priority": "core",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_initial_on_minimum_up_is_enforced_for_zero_load": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_initial_off_minimum_down_blocks_startup": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_ramp_down_is_checked_between_periods": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_on_generator_respects_minimum_output": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_on_generator_respects_maximum_output": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_repeat_run_is_byte_identical": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_summary_cost_includes_generation_and_startup": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_absent_parent_directory_is_io_failure": {
       "priority": "supporting",
       "rationale": "independent contract behavior with direct assertion",
-      "weight": 0.0625
+      "weight": 0.05882353
     },
     "test_outputs.py::test_terminal_storage_requirement_is_met": {
       "priority": "core",
       "rationale": "independent terminal-state contract axis",
-      "weight": 0.0
+      "weight": 0.05882352
     }
   },
   "weight_policy": {
