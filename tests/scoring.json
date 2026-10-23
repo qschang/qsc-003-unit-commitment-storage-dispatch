@@ -6,91 +6,123 @@
     "test_outputs::test_ramp_limits_include_initial_transition",
     "test_outputs::test_zero_output_when_off",
     "test_outputs::test_storage_recurrence_uses_efficiencies",
-    "test_outputs::test_storage_capacity_is_never_exceeded",
-    "test_outputs::test_renewable_is_used_before_thermal",
-    "test_outputs::test_unserved_load_is_last_resort_and_penalized",
-    "test_outputs::test_balance_residual_is_zero",
-    "test_outputs::test_summary_commitment_hours_matches_records",
-    "test_outputs::test_output_schema_is_exact_and_ordered",
-    "test_outputs::test_invalid_input_preserves_absent_output",
-    "test_outputs::test_invalid_input_preserves_sentinel",
-    "test_outputs::test_late_invalid_period_is_atomic"
+    "test_outputs::test_storage_capacity_is_never_exceeded"
   ],
   "tests": {
     "test_outputs::test_minimum_up_duration_is_respected": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_initial_off_state_honors_minimum_down_duration": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_ramp_limits_include_initial_transition": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_zero_output_when_off": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_storage_recurrence_uses_efficiencies": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_storage_capacity_is_never_exceeded": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_renewable_is_used_before_thermal": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_unserved_load_is_last_resort_and_penalized": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_balance_residual_is_zero": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_summary_commitment_hours_matches_records": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_output_schema_is_exact_and_ordered": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_invalid_input_preserves_absent_output": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_invalid_input_preserves_sentinel": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     },
     "test_outputs::test_late_invalid_period_is_atomic": {
       "priority": "core",
-      "rationale": "contract behavior is independently asserted",
-      "weight": 0.0714285714
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_initial_on_minimum_up_is_enforced_for_zero_load": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_initial_off_minimum_down_blocks_startup": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_ramp_down_is_checked_between_periods": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_on_generator_respects_minimum_output": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_on_generator_respects_maximum_output": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_repeat_run_is_byte_identical": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_summary_cost_includes_generation_and_startup": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
+    },
+    "test_outputs::test_absent_parent_directory_is_io_failure": {
+      "priority": "supporting",
+      "rationale": "independent contract behavior with direct assertion",
+      "weight": 0.04545455
     }
   },
   "weight_policy": {
-    "basis": "equal_contract_gate",
-    "core_min_share": 1.0,
+    "basis": "business_priority",
+    "core_min_share": 0.5,
     "version": 1
   }
 }

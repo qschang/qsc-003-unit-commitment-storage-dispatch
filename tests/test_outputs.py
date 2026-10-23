@@ -71,3 +71,45 @@ def test_late_invalid_period_is_atomic():
  d=base(); d['periods'][2]['renewable_MW']=float('nan'); r,b,_=run(d); assert r.returncode!=0 and b is None
 
 
+
+def test_initial_on_minimum_up_is_enforced_for_zero_load():
+    """An initially running unit remains on for its required minimum duration."""
+    d=base(); d['horizon_hours']=3; d['periods']=[{'load_MW':0,'renewable_MW':0}]*3; d['generators'][0]['initial_state']='on'; d['generators'][0]['min_up_hours']=2
+    x=good(d); states=[q['generators'][0]['on'] for q in rec(x)]; assert states[:2]==[True,True]
+
+def test_initial_off_minimum_down_blocks_startup():
+    """An initially stopped unit cannot start before its minimum downtime expires."""
+    d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0}]*2; d['generators'][0]['min_down_hours']=2
+    x=good(d); assert [q['generators'][0]['on'] for q in rec(x)]==[False,False]
+
+def test_ramp_down_is_checked_between_periods():
+    """A running unit cannot reduce output faster than its ramp-down limit."""
+    d=base(); d['horizon_hours']=2; d['periods']=[{'load_MW':8,'renewable_MW':0},{'load_MW':0,'renewable_MW':0}]; d['generators'][0]['initial_state']='on'; d['generators'][0]['ramp_down_MW']=1
+    x=good(d); p=[g['power_MW'] for q in rec(x) for g in q['generators'] if g['id']=='cheap']; assert p[0]-p[1]<=1+1e-9
+
+def test_on_generator_respects_minimum_output():
+    """Every committed unit produces at least its minimum output."""
+    x=good();
+    for q in rec(x):
+        for g in q['generators']:
+            if g['on']: assert g['power_MW']>=({'cheap':2,'expensive':1}[g['id']]-1e-9)
+
+def test_on_generator_respects_maximum_output():
+    """Every committed unit stays within its maximum output."""
+    x=good();
+    for q in rec(x):
+        for g in q['generators']:
+            if g['on']: assert g['power_MW']<=({'cheap':8,'expensive':10}[g['id']]+1e-9)
+
+def test_repeat_run_is_byte_identical():
+    """The same valid input produces byte-identical output on repeat execution."""
+    r1,b1,_=run(base()); r2,b2,_=run(base()); assert r1.returncode==0 and r2.returncode==0 and b1==b2
+
+def test_summary_cost_includes_generation_and_startup():
+    """Reported cost is at least the independently recomputed generation cost."""
+    x=good(); gen=sum(g['power_MW']*({'cheap':10,'expensive':30}[g['id']]) for q in rec(x) for g in q['generators']); assert x['summary']['total_cost']>=gen-1e-9
+
+def test_absent_parent_directory_is_io_failure():
+    """A missing output parent is rejected without creating a side artifact."""
+    with tempfile.TemporaryDirectory() as td:
+        p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists() and not (p/'missing').exists()
