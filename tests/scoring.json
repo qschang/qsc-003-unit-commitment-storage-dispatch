@@ -92,12 +92,12 @@
     "test_outputs.py::test_terminal_storage_requirement_is_met": {
       "priority": "core",
       "rationale": "independent terminal-state contract axis",
-      "weight": 0.05882352
+      "weight": 0.04882352
     },
     "test_outputs.py::test_efficiency_upper_boundary_is_valid": {
       "priority": "supporting",
       "rationale": "inclusive numeric boundary",
-      "weight": -0.0
+      "weight": 0.01
     }
   },
   "weight_policy": {
