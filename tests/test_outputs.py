@@ -16,7 +16,8 @@ def run(d,existing=False):
   p=Path(td); i=p/'i.json'; o=p/'o.json'; i.write_text(json.dumps(d)); sentinel=b'keep'
   if existing:o.write_bytes(sentinel)
   r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True,timeout=20)
-  return r,o.read_bytes() if o.exists() else None,sentinel,sorted(x.name for x in p.glob('*.tmp'))
+  extras=sorted(x.name for x in p.iterdir() if x.name not in {'i.json','o.json'})
+  return r,o.read_bytes() if o.exists() else None,sentinel,extras
 def good(d=None):
  r,b,_,_=run(base() if d is None else d); assert r.returncode==0,r.stderr.decode(); return json.loads(b)
 def test_cop_uses_ambient_slope():
@@ -51,6 +52,7 @@ def test_duplicate_key_is_rejected():
  """CASE-QSC003-REJECT-01: duplicate keys."""
  with tempfile.TemporaryDirectory() as td:
   p=Path(td); i=p/'i.json'; o=p/'o.json'; i.write_text('{"horizon_hours":1,"horizon_hours":1}'); r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists()
+  assert sorted(x.name for x in p.iterdir())==['i.json']
 def test_invalid_input_preserves_sentinel():
  """CASE-QSC003-REJECT-02: sentinel preservation."""
  d=base(); d['periods'][1]['demand_MWh']=-1; r,b,s,tmp=run(d,True); assert r.returncode!=0 and b==s and tmp==[]
@@ -61,16 +63,17 @@ def test_missing_parent_is_rejected():
  """CASE-QSC003-IO-02: missing parent."""
  with tempfile.TemporaryDirectory() as td:
   p=Path(td); i=p/'i.json'; i.write_text(json.dumps(base())); o=p/'missing'/'o.json'; r=subprocess.run([sys.executable,APP,str(i),str(o)],capture_output=True); assert r.returncode!=0 and not o.exists()
+  assert sorted(x.name for x in p.iterdir())==['i.json']
 def test_efficiency_boundary_one_is_valid():
  """CASE-QSC003-BOUND-01: inclusive efficiency boundary."""
  d=base(); d['thermal_store']['charge_efficiency']=1.0; d['thermal_store']['discharge_efficiency']=1.0; assert 'summary' in good(d)
 def test_boolean_numeric_is_rejected():
  """CASE-QSC003-REJECT-04: booleans are not numbers."""
- d=base(); d['boiler']['efficiency']=True; r,b,_,_=run(d); assert r.returncode!=0 and b is None
+ d=base(); d['boiler']['efficiency']=True; r,b,_,extras=run(d); assert r.returncode!=0 and b is None and extras==[]
 
 def test_zero_efficiency_is_rejected():
     """CASE-QSC003-REJECT-05: zero store efficiency is invalid."""
-    d=base(); d['thermal_store']['charge_efficiency']=0; r,b,_,_=run(d); assert r.returncode!=0 and b is None
+    d=base(); d['thermal_store']['charge_efficiency']=0; r,b,_,extras=run(d); assert r.returncode!=0 and b is None and extras==[]
 
 def test_zero_initial_inventory_is_valid():
     """CASE-QSC003-BOUND-02: zero initial inventory is inclusive."""
@@ -89,3 +92,17 @@ def test_heat_pump_threshold_is_inclusive():
 def test_efficiency_upper_boundary_is_inclusive():
     """CASE-QSC003-BOUND-05: efficiency one is accepted."""
     d=base(); d['thermal_store']['charge_efficiency']=1.0; d['thermal_store']['discharge_efficiency']=1.0; assert 'schedule' in good(d)
+
+def test_cross_period_inventory_obligation_is_carried_forward():
+    """CASE-QSC003-STATE-01: inventory from one period constrains the next."""
+    d=base(); d['horizon_hours']=2
+    d['periods']=[{'demand_MWh':0,'ambient_C':20,'electricity_price':1}, {'demand_MWh':3,'ambient_C':0,'electricity_price':1}]
+    d['boiler'].update({'max_heat_MW':0,'min_heat_MW':0}); d['heat_pump']['max_heat_MW']=0
+    d['thermal_store'].update({'capacity_MWh':3,'initial_MWh':3,'max_discharge_MW':3,'terminal_MWh':0})
+    x=good(d); assert x['schedule'][1]['storage']['discharge_MW']>0
+
+def test_cost_uses_cop_and_electricity_price_independently():
+    """CASE-QSC003-COST-02: COP changes electrical heat cost."""
+    d=base(); d['horizon_hours']=1; d['periods']=[{'demand_MWh':2,'ambient_C':10,'electricity_price':100}]
+    x=good(d); expected=2/(2.5+0.05*10)*100
+    assert x['schedule'][0]['operating_cost']==pytest.approx(expected)
