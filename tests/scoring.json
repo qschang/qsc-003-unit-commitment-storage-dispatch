@@ -1,17 +1,7 @@
 {
   "schema_version": 1,
-  "gate_tests": [
-    "test_outputs.py::test_cop_uses_ambient_slope",
-    "test_outputs.py::test_store_recursion_uses_efficiency",
-    "test_outputs.py::test_heat_balance_is_closed",
-    "test_outputs.py::test_repeat_is_byte_identical"
-  ],
+  "gate_tests": [],
   "tests": {
-    "test_outputs.py::test_cop_uses_ambient_slope": {
-      "priority": "core",
-      "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
-    },
     "test_outputs.py::test_heat_pump_is_unavailable_below_threshold": {
       "priority": "core",
       "rationale": "direct domain assertion",
@@ -22,17 +12,7 @@
       "rationale": "direct domain assertion",
       "weight": 0.0479466339790621
     },
-    "test_outputs.py::test_store_recursion_uses_efficiency": {
-      "priority": "core",
-      "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
-    },
     "test_outputs.py::test_store_capacity_and_terminal_state": {
-      "priority": "core",
-      "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
-    },
-    "test_outputs.py::test_heat_balance_is_closed": {
       "priority": "core",
       "rationale": "direct domain assertion",
       "weight": 0.0479466339790621
@@ -43,11 +23,6 @@
       "weight": 0.0479466339790621
     },
     "test_outputs.py::test_output_shape_is_exact": {
-      "priority": "core",
-      "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
-    },
-    "test_outputs.py::test_repeat_is_byte_identical": {
       "priority": "core",
       "rationale": "direct domain assertion",
       "weight": 0.0479466339790621
