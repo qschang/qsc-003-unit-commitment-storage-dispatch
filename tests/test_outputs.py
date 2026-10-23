@@ -124,5 +124,5 @@ def test_terminal_storage_requirement_is_met():
 
 
 def test_efficiency_upper_boundary_is_valid():
-    """The contract accepts unit efficiency at its inclusive upper boundary."""
+    """The input is UTF-8 JSON with `horizon_hours`, `generators`, `storage`, and `periods`."""
     d=base(); d['storage']['charge_efficiency']=1.0; d['storage']['discharge_efficiency']=1.0; x=good(d); assert x['summary']['final_storage_MWh']>=0
