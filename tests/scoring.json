@@ -10,102 +10,102 @@
     "test_outputs.py::test_heat_pump_is_unavailable_below_threshold": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_boiler_heat_respects_limit": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_store_capacity_and_terminal_state": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_cost_contains_penalty": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_output_shape_is_exact": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_duplicate_key_is_rejected": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_invalid_input_preserves_sentinel": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_late_invalid_record_is_atomic": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_missing_parent_is_rejected": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_efficiency_boundary_one_is_valid": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_boolean_numeric_is_rejected": {
       "priority": "core",
       "rationale": "direct domain assertion",
-      "weight": 0.0479466339790621
+      "weight": 0.059324220778006725
     },
     "test_outputs.py::test_zero_efficiency_is_rejected": {
       "priority": "core",
       "rationale": "direct rejection assertion",
-      "weight": 0.03595997368629789
+      "weight": 0.044493163358846885
     },
     "test_outputs.py::test_zero_initial_inventory_is_valid": {
       "priority": "core",
       "rationale": "direct boundary assertion",
-      "weight": 0.02876797894903831
+      "weight": 0.0355945306870775
     },
     "test_outputs.py::test_initial_inventory_zero_boundary_is_accepted": {
       "priority": "core",
       "rationale": "direct inclusive boundary assertion",
-      "weight": 0.02876797894903831
+      "weight": 0.0355945306870775
     },
     "test_outputs.py::test_capacity_upper_boundary_is_accepted": {
       "priority": "core",
       "rationale": "direct inclusive boundary assertion",
-      "weight": 0.02876797894903831
+      "weight": 0.0355945306870775
     },
     "test_outputs.py::test_heat_pump_threshold_is_inclusive": {
       "priority": "core",
       "rationale": "direct inclusive boundary assertion",
-      "weight": 0.02876797894903831
+      "weight": 0.0355945306870775
     },
     "test_outputs.py::test_efficiency_upper_boundary_is_inclusive": {
       "priority": "core",
       "rationale": "direct inclusive boundary assertion",
-      "weight": 0.02876797894903831
+      "weight": 0.0355945306870775
     },
     "test_outputs.py::test_cross_period_inventory_obligation_is_carried_forward": {
       "priority": "core",
       "rationale": "cross-period state assertion",
-      "weight": 0.031269541710520356
+      "weight": 0.03868970649476835
     },
     "test_outputs.py::test_cost_uses_cop_and_electricity_price_independently": {
       "priority": "core",
       "rationale": "independent cost assertion",
-      "weight": 0.031269541710520356
+      "weight": 0.03868970649476835
     },
     "test_outputs.py::test_state_transition_accept_reject_accept_isolated": {
       "priority": "core",
       "rationale": "state transition isolation",
-      "weight": 0.038461538461538464
+      "weight": 0.04758834165815488
     }
   },
   "weight_policy": {
