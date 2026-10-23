@@ -81,6 +81,11 @@
       "priority": "core",
       "rationale": "direct rejection assertion",
       "weight": 0.05
+    },
+    "test_outputs.py::test_zero_initial_inventory_is_valid": {
+      "priority": "core",
+      "rationale": "direct boundary assertion",
+      "weight": 0.04
     }
   },
   "weight_policy": {

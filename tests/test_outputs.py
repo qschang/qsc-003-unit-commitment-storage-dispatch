@@ -71,3 +71,7 @@ def test_boolean_numeric_is_rejected():
 def test_zero_efficiency_is_rejected():
     """CASE-QSC003-REJECT-05: zero store efficiency is invalid."""
     d=base(); d['thermal_store']['charge_efficiency']=0; r,b,_,_=run(d); assert r.returncode!=0 and b is None
+
+def test_zero_initial_inventory_is_valid():
+    """CASE-QSC003-BOUND-02: zero initial inventory is inclusive."""
+    d=base(); d['thermal_store']['initial_MWh']=0; assert 'summary' in good(d)

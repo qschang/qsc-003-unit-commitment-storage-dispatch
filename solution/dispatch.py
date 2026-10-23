@@ -20,7 +20,7 @@ def validate(d):
  if q['max_heat_MW']<0 or q['cop_base']<=0 or q['cop_slope']<0: bad('heat pump range')
  s=d['thermal_store']; req={'capacity_MWh','initial_MWh','max_charge_MW','max_discharge_MW','charge_efficiency','discharge_efficiency','terminal_MWh'}
  if not isinstance(s,dict) or set(s)!=req or not all(num(s[k]) for k in req): bad('store')
- if s['capacity_MWh']<0 or not (0<=s['initial_MWh']<=s['capacity_MWh']) or not (s['charge_efficiency']<=1 and s['charge_efficiency']>0) or not (0<=s['terminal_MWh']<=s['capacity_MWh']) or s['max_charge_MW']<0 or s['max_discharge_MW']<0 or not (0<s['charge_efficiency']<=1) or not (0<s['discharge_efficiency']<=1): bad('store range')
+ if s['capacity_MWh']<0 or not (0<=s['initial_MWh']<=s['capacity_MWh']) or not (0<=s['terminal_MWh']<=s['capacity_MWh']) or s['max_charge_MW']<0 or s['max_discharge_MW']<0 or not (0<s['charge_efficiency']<=1) or not (0<s['discharge_efficiency']<=1): bad('store range')
 def solve(d):
  if not _reference_guard(): bad('guard')
  validate(d); b=d['boiler']; q=d['heat_pump']; s=d['thermal_store']; state=s['initial_MWh']; out=[]; total=0.0
