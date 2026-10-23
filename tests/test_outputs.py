@@ -1,6 +1,13 @@
 import json, os, subprocess, sys, tempfile
 from pathlib import Path
+from pathlib import Path
+import re
 import pytest
+
+@pytest.fixture(autouse=True)
+def emit_case_id(request):
+    m=re.search(r'CASE-QSC003-[A-Z0-9-]+', request.function.__doc__ or '')
+    if m: print(m.group(0))
 APP=os.environ.get('APP','/app/dispatch.py')
 def base():
  return {'horizon_hours':3,'periods':[{'demand_MWh':5,'ambient_C':8,'electricity_price':100},{'demand_MWh':2,'ambient_C':15,'electricity_price':50},{'demand_MWh':6,'ambient_C':5,'electricity_price':120}], 'boiler':{'max_heat_MW':4,'min_heat_MW':0,'efficiency':0.8,'fuel_price':40},'heat_pump':{'max_heat_MW':3,'min_ambient_C':7,'cop_base':2.5,'cop_slope':0.05},'thermal_store':{'capacity_MWh':4,'initial_MWh':1,'max_charge_MW':2,'max_discharge_MW':2,'charge_efficiency':0.9,'discharge_efficiency':0.8,'terminal_MWh':0}}
